@@ -7,34 +7,29 @@ fun buildFolder(commands: List<String>): Map<String, Long> {
     val path = Stack<Directory>()
     var currentDirectory = root
 
-    var counter = 0
-    while (counter < commands.size) {
-        if (commands[counter].startsWith("$")) {
-            val command = commands[counter].split(" ")
-            when (command[1]) {
-                "cd" -> {
-                    currentDirectory = when(command[2]) {
-                        ".." -> path.pop()
-                        "/" -> root
+    for (line in commands) {
+        val tokens = line.split(" ")
+        when (tokens[0]) {
+            // $ cd <path> or $ ls
+            "$" -> {
+                if (tokens[1] == "cd") {
+                    currentDirectory = when(tokens[2]) {
+                        ".." -> path.pop()  // go back one folder up
+                        "/" -> root         // go back all the way up
                         else -> {
-                            path.push(currentDirectory)
-                            currentDirectory.children[command[2]]!!
+                            path.push(currentDirectory) // store current folder to go back later
+                            currentDirectory.children[tokens[2]]!! // move to specified folder
                         }
                     }
                 }
-                "ls" -> {
-                    counter++
-                    while (counter < commands.size && !commands[counter].startsWith("$")) {
-                        val lastOutput = commands[counter].split(" ")
-                        if (lastOutput[0] == "dir") currentDirectory.children[lastOutput[1]] = Directory()
-                        else currentDirectory.totalSize += lastOutput[0].toLong()
-                        counter++
-                    }
-                    counter--
+                else {
+                    // ls command. Not doing anything since we'll handle the outputs on the next loop
                 }
             }
+            // output of ls
+            "dir" -> currentDirectory.children[tokens[1]] = Directory() // dir <dir_name>
+            else -> currentDirectory.totalSize += tokens[0].toLong() // <file_size> <file_name>
         }
-        counter++
     }
     return calculateSize(root)
 }
