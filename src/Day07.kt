@@ -21,8 +21,7 @@ fun buildFolder(commands: List<String>): Map<String, Long> {
                             currentDirectory.children[tokens[2]]!! // move to specified folder
                         }
                     }
-                }
-                else {
+                } else {
                     // ls command. Not doing anything since we'll handle the outputs on the next loop
                 }
             }
