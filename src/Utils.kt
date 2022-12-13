@@ -13,3 +13,14 @@ fun readInput(name: String) = File("src", "$name.txt").readLines()
 fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteArray()))
     .toString(16)
     .padStart(32, '0')
+
+data class Tree<T>(var value: T? = null, val children: MutableList<Tree<T>> = mutableListOf())
+
+fun <T> Tree<T>.print(level: Int  = 0) {
+    println("${"\t".repeat(level)}${this.value}")
+    this.children.forEach { it.print(level + 1) }
+}
+
+fun <T> Tree<T>.isLeaf(): Boolean {
+    return this.value != null && this.children.isEmpty()
+}
