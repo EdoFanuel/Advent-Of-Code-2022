@@ -1,6 +1,7 @@
 import java.io.File
 import java.math.BigInteger
 import java.security.MessageDigest
+import java.util.regex.Pattern
 
 /**
  * Reads lines from the given input txt file.
