@@ -22,28 +22,64 @@ data class CacheKey(val current: List<String>, val openedValve: Set<String>, val
     }
 }
 
+fun generateAction(pos: String, openedValve: Set<String>, power: Map<String, Long>, connections: Map<String, Set<String>>): Set<String> {
+    val result = mutableSetOf<String>()
+    if (pos !in openedValve && power[pos]!! > 0) {
+        result += "open $pos"
+    }
+    for (next in connections[pos]!!) {
+        result += "goto $next"
+    }
+    return result
+}
+
+fun generateMultipleActions(positions: List<String>, openedValve: Set<String>, power: Map<String, Long>, connections: Map<String, Set<String>>, i: Int = 0): List<List<String>> {
+    if (i >= positions.size) return listOf()
+
+    val playerAction = generateAction(positions[i], openedValve, power, connections)
+    if (i == positions.lastIndex) return playerAction.map { listOf(it) }
+    val result = mutableListOf<List<String>>()
+    for (action in playerAction) {
+        val valves = mutableSetOf<String>()
+        valves += openedValve
+        val (command, target) = action.split(" ")
+        if (command == "open") valves += target
+        for (nextActions in generateMultipleActions(positions, valves, power, connections, i + 1)) {
+            for (nextAction in nextActions) {
+                result += listOf(action, nextAction)
+            }
+        }
+    }
+    return result
+}
+
 fun traverseDFS(key: CacheKey, power: Map<String, Long>, connections: Map<String, Set<String>>, cache: MutableMap<CacheKey, Long>): Long {
     val time = key.remainingTime - 1
-    if (time < 0) return 0
+    if (time < 0) return 0 // time's up. exit recursion
     if (key.openedValve == power.filter { (_, v) -> v > 0}.keys) return 0 // Everything already opened, exit recursion
-    if (cache[key] != null) return cache[key]!!
-    for (pos in key.current) {
-        if (pos !in key.openedValve && power[pos]!! > 0) {
-            val pressure = power[pos]!! * time
-            val openedValve = mutableSetOf<String>()
-            openedValve += key.openedValve
-            openedValve += key.current
-            cache[key] = max(cache[key] ?: 0, pressure + traverseDFS(
-                CacheKey(key.current, openedValve, time),
-                power, connections, cache
-            )) // turn on the valve
+    if (cache[key] != null) return cache[key]!! // calculation already done, return value stored
+    for (actions in generateMultipleActions(key.current, key.openedValve, power, connections)) {
+        val nextPosition = Array(key.current.size) { "" }
+        val openedValve = mutableSetOf<String>()
+        var pressureGain = 0L
+        openedValve += key.openedValve
+        for ((i, act) in actions.withIndex()) {
+            val (command, pos) = act.split(" ")
+            when (command) {
+                "open" -> {
+                    pressureGain += power[pos]!! * time
+                    openedValve += pos
+                    nextPosition[i] = key.current[i] // no change
+                }
+                "goto" -> {
+                    nextPosition[i] = pos
+                }
+            }
         }
-        for (next in connections[pos]!!) {
-            cache[key] = max(cache[key] ?: 0, traverseDFS(
-                CacheKey(listOf(next), key.openedValve, time),
-                power, connections, cache
-            ))
-        }
+        cache[key] = max(cache[key] ?: 0, pressureGain + traverseDFS(
+            CacheKey(nextPosition.toList(), openedValve, time),
+            power, connections, cache
+        ))
     }
     return cache[key]!!
 }
@@ -75,7 +111,12 @@ fun main() {
             power[source] = flow.toLong()
             graph[source] = connections.split(", ").toSet()
         }
-        return 0
+        return traverseDFS(
+            CacheKey(listOf("AA", "AA"), mutableSetOf(), 26),
+            power,
+            graph,
+            mutableMapOf()
+        )
     }
 
     val test = readInput("Day16_test")
