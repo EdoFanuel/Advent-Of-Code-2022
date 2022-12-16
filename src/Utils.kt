@@ -15,6 +15,8 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
     .toString(16)
     .padStart(32, '0')
 
+fun String.match(pattern: String) = Regex(pattern).matchEntire(this)
+
 data class Tree<T>(var value: T? = null, val children: MutableList<Tree<T>> = mutableListOf())
 
 fun <T> Tree<T>.print(level: Int  = 0) {
