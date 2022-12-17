@@ -17,6 +17,12 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
 
 fun String.match(pattern: String) = Regex(pattern).matchEntire(this)
 
+class LRUCache<K, V>(val capacity: Int): LinkedHashMap<K, V>() {
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<K, V>?): Boolean {
+        return size > capacity
+    }
+}
+
 data class Tree<T>(var value: T? = null, val children: MutableList<Tree<T>> = mutableListOf())
 
 fun <T> Tree<T>.print(level: Int  = 0) {
