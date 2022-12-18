@@ -1,3 +1,4 @@
+import utils.Coord2D
 import kotlin.math.min
 
 val rocks = listOf(
