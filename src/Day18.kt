@@ -12,6 +12,37 @@ enum class Direction3D(val vector: Coord3D) {
 }
 
 fun main() {
+    fun part1(input: List<String>): Long {
+        val shape = input.map { row ->
+            val (a, b, c) = row.split(",").map { it.toLong() }
+            Coord3D(a, b, c)
+        }.toSet()
+        return calculateSurfaceArea(shape)
+    }
+
+    fun part2(input: List<String>): Long {
+        val shape = input.map { row ->
+            val (a, b, c) = row.split(",").map { it.toLong() }
+            Coord3D(a, b, c)
+        }.toMutableSet()
+        val bbox = BBox3D(
+            shape.minOf { it.x }..shape.maxOf { it.x },
+            shape.minOf { it.y }..shape.maxOf { it.y },
+            shape.minOf { it.z }..shape.maxOf { it.z }
+        )
+        val trappedAir = mutableSetOf<Coord3D>()
+        for (x in bbox.x) {
+            for (y in bbox.y) {
+                for (z in bbox.z) {
+                    if (isTrapped(Coord3D(x, y, z), bbox, shape)) trappedAir += Coord3D(x, y, z)
+                }
+            }
+        }
+        val surfaceArea = calculateSurfaceArea(shape)
+        val airArea = calculateSurfaceArea(trappedAir)
+        return surfaceArea - airArea
+    }
+
     val test = readInput("Day18_test")
     println("=== Part 1 (test) ===")
     println(part1(test))
@@ -23,37 +54,6 @@ fun main() {
     println(part1(input))
     println("=== Part 2 (puzzle) ===")
     println(part2(input))
-}
-
-fun part1(input: List<String>): Long {
-    val shape = input.map { row ->
-        val (a, b, c) = row.split(",").map { it.toLong() }
-        Coord3D(a, b, c)
-    }.toSet()
-    return calculateSurfaceArea(shape)
-}
-
-fun part2(input: List<String>): Long {
-    val shape = input.map { row ->
-        val (a, b, c) = row.split(",").map { it.toLong() }
-        Coord3D(a, b, c)
-    }.toMutableSet()
-    val bbox = BBox3D(
-        shape.minOf { it.x }..shape.maxOf { it.x },
-        shape.minOf { it.y }..shape.maxOf { it.y },
-        shape.minOf { it.z }..shape.maxOf { it.z }
-    )
-    val trappedAir = mutableSetOf<Coord3D>()
-    for (x in bbox.x) {
-        for (y in bbox.y) {
-            for (z in bbox.z) {
-                if (isTrapped(Coord3D(x, y, z), bbox, shape)) trappedAir += Coord3D(x, y, z)
-            }
-        }
-    }
-    val surfaceArea = calculateSurfaceArea(shape)
-    val airArea = calculateSurfaceArea(trappedAir)
-    return surfaceArea - airArea
 }
 
 fun calculateSurfaceArea(shape: Set<Coord3D>): Long {

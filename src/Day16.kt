@@ -1,24 +1,26 @@
 import kotlin.math.max
 
-data class CacheKey(val current: List<String>, val openedValve: Set<String>, val remainingTime: Int) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+class Day16 {
+    data class CacheKey(val current: List<String>, val openedValve: Set<String>, val remainingTime: Int) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
 
-        other as CacheKey
+            other as CacheKey
 
-        if (current != other.current) return false
-        if (openedValve != other.openedValve) return false
-        if (remainingTime != other.remainingTime) return false
+            if (current != other.current) return false
+            if (openedValve != other.openedValve) return false
+            if (remainingTime != other.remainingTime) return false
 
-        return true
-    }
+            return true
+        }
 
-    override fun hashCode(): Int {
-        var result = current.hashCode()
-        result = 31 * result + openedValve.hashCode()
-        result = 31 * result + remainingTime
-        return result
+        override fun hashCode(): Int {
+            var result = current.hashCode()
+            result = 31 * result + openedValve.hashCode()
+            result = 31 * result + remainingTime
+            return result
+        }
     }
 }
 
@@ -53,7 +55,7 @@ fun generateMultipleActions(positions: List<String>, openedValve: Set<String>, p
     return result
 }
 
-fun traverseDFS(key: CacheKey, power: Map<String, Long>, connections: Map<String, Set<String>>, cache: MutableMap<CacheKey, Long>): Long {
+fun traverseDFS(key: Day16.CacheKey, power: Map<String, Long>, connections: Map<String, Set<String>>, cache: MutableMap<Day16.CacheKey, Long>): Long {
     val time = key.remainingTime - 1
     if (time < 0) return 0 // time's up. exit recursion
     if (key.openedValve == power.filter { (_, v) -> v > 0}.keys) return 0 // Everything already opened, exit recursion
@@ -77,7 +79,7 @@ fun traverseDFS(key: CacheKey, power: Map<String, Long>, connections: Map<String
             }
         }
         cache[key] = max(cache[key] ?: 0, pressureGain + traverseDFS(
-            CacheKey(nextPosition.toList(), openedValve, time),
+            Day16.CacheKey(nextPosition.toList(), openedValve, time),
             power, connections, cache
         ))
     }
@@ -96,7 +98,7 @@ fun main() {
             graph[source] = connections.split(", ").toSet()
         }
         return traverseDFS(
-            CacheKey(listOf("AA"), mutableSetOf(), 30),
+            Day16.CacheKey(listOf("AA"), mutableSetOf(), 30),
             power,
             graph,
             mutableMapOf()
@@ -112,7 +114,7 @@ fun main() {
             graph[source] = connections.split(", ").toSet()
         }
         return traverseDFS(
-            CacheKey(listOf("AA", "AA"), mutableSetOf(), 26),
+            Day16.CacheKey(listOf("AA", "AA"), mutableSetOf(), 26),
             power,
             graph,
             mutableMapOf()
