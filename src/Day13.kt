@@ -39,9 +39,9 @@ fun buildTree(input: String): Tree<Int> {
 }
 
 fun compare(a: Tree<Int>, b: Tree<Int>): Int {
-    if (a.isLeaf() && b.isLeaf()) return (a.value!! - b.value!!).sign
-    val childrenA = if (a.isLeaf()) mutableListOf(Tree(a.value)) else a.children
-    val childrenB = if (b.isLeaf()) mutableListOf(Tree(b.value)) else b.children
+    if (a.isLeaf() && a.hasValue() && b.isLeaf() && b.hasValue()) return (a.value!! - b.value!!).sign
+    val childrenA = if (a.isLeaf() && a.hasValue()) mutableListOf(Tree(a.value)) else a.children
+    val childrenB = if (b.isLeaf() && b.hasValue()) mutableListOf(Tree(b.value)) else b.children
 
     for(i in 0 until min(childrenA.size, childrenB.size)) {
         when (compare(childrenA[i], childrenB[i])) {
