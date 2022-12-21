@@ -4,17 +4,21 @@ import kotlin.math.max
 import kotlin.math.min
 
 class Day20 {
-    fun readInput(input: List<String>): List<BigInteger> {
-        return input.map { it.toBigInteger() }
+    fun readInput(input: List<String>): List<Long> {
+        return input.map { it.toLong() }
     }
 
-    fun decrypt(input: List<BigInteger>): List<BigInteger> {
+    fun decrypt(input: List<Long>, loop: Int = 1): List<Long> {
         val result = input.mapIndexed { i, value -> i to value}.toMutableList()
-        for (i in input.indices) {
-            val (idx, elem) = result.withIndex().first { it.value.first == i}
-            result.removeAt(idx)
-            val newIdx = (idx.toBigInteger() + elem.second).mod(input.size.toBigInteger() - BigInteger.ONE).toInt()
-            result.add(newIdx, elem)
+        repeat(loop) {
+            for ((i, value) in input.withIndex()) {
+                val idx = result.indexOfFirst { it.first == i }
+                Collections.rotate(result, -idx)
+                result.removeFirst()
+                Collections.rotate(result, (-value % result.size).toInt())
+                result.add(0, i to value)
+                Collections.rotate(result, (value % result.size).toInt())
+            }
         }
         return result.map { it.second }
     }
@@ -23,12 +27,12 @@ class Day20 {
 fun main() {
     val day = Day20()
 
-    fun part1(input: List<String>): BigInteger {
+    fun part1(input: List<String>): Long {
         val data = day.readInput(input)
         println("input: $data")
         val decrypted = day.decrypt(data)
         println("output: $decrypted")
-        val zeroIdx = decrypted.indexOf(BigInteger.ZERO)
+        val zeroIdx = decrypted.indexOfFirst { it == 0L}
         val digits = listOf(
             decrypted[(zeroIdx + 1000) % decrypted.size],
             decrypted[(zeroIdx + 2000) % decrypted.size],
@@ -38,20 +42,17 @@ fun main() {
         return digits.sumOf { it }
     }
 
-    fun part2(input: List<String>): BigInteger {
+    fun part2(input: List<String>): Long {
         val decryptionKey = 811_589_153
-        var data = day.readInput(input).map { it.multiply(decryptionKey.toBigInteger()) }
+        val data = day.readInput(input).map { it * decryptionKey }
         println("input: $data")
-        for (i in 0 until 10) {
-            data = day.decrypt(data)
-            println("iteration #$i: $data")
-        }
-        println("output: $data")
-        val zeroIdx = data.indexOf(BigInteger.ZERO)
+        val decrypted = day.decrypt(data, 10)
+        println("output: $decrypted")
+        val zeroIdx = decrypted.indexOfFirst { it == 0L}
         val digits = listOf(
-            data[(zeroIdx + 1000) % data.size],
-            data[(zeroIdx + 2000) % data.size],
-            data[(zeroIdx + 3000) % data.size]
+            decrypted[(zeroIdx + 1000) % decrypted.size],
+            decrypted[(zeroIdx + 2000) % decrypted.size],
+            decrypted[(zeroIdx + 3000) % decrypted.size]
         )
         println("$zeroIdx, $digits")
         return digits.sumOf { it }
