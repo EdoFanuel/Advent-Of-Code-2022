@@ -259,6 +259,7 @@ fun main() {
             Regex("\\d+").findAll(path).map { it.value.toInt() }.toList(),
             Regex("[LR]").findAll(path).map { if (it.value == "L") -1 else 1 }.toList()
         )
+        println("$direction, (${coord.x + 1}, ${coord.y + 1}")
         return 1000 * (coord.x + 1) + 4 * (coord.y + 1) + direction.value
     }
 
@@ -278,6 +279,7 @@ fun main() {
                 if (net[i][j] == face) {
                     val row = i * size + position.x + 1
                     val col = j * size + position.y + 1
+                    println("$direction ($row, $col)")
                     return row * 1000 + col * 4 + direction.value
                 }
             }
