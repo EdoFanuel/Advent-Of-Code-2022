@@ -1,27 +1,27 @@
-import utils.Coord2D
+import utils.Coord2DLong
 import kotlin.math.min
 
 val rocks = listOf(
-    (0..3L).map { Coord2D(it, 0) },
-    listOf(Coord2D(0, 1), Coord2D(1, 2), Coord2D(1, 1), Coord2D(1, 0), Coord2D(2, 1)),
-    listOf(Coord2D(0, 0), Coord2D(1, 0), Coord2D(2, 2), Coord2D(2, 1), Coord2D(2, 0)),
-    (0..3L).map { Coord2D(0, it) },
-    listOf(Coord2D(0, 0), Coord2D(0, 1), Coord2D(1, 0), Coord2D(1, 1))
+    (0..3L).map { Coord2DLong(it, 0) },
+    listOf(Coord2DLong(0, 1), Coord2DLong(1, 2), Coord2DLong(1, 1), Coord2DLong(1, 0), Coord2DLong(2, 1)),
+    listOf(Coord2DLong(0, 0), Coord2DLong(1, 0), Coord2DLong(2, 2), Coord2DLong(2, 1), Coord2DLong(2, 0)),
+    (0..3L).map { Coord2DLong(0, it) },
+    listOf(Coord2DLong(0, 0), Coord2DLong(0, 1), Coord2DLong(1, 0), Coord2DLong(1, 1))
 )
 val directions = mapOf(
-    '<' to Coord2D(-1, 0),
-    '>' to Coord2D(1, 0),
-    'v' to Coord2D(0, -1)
+    '<' to Coord2DLong(-1, 0),
+    '>' to Coord2DLong(1, 0),
+    'v' to Coord2DLong(0, -1)
 )
 
-fun isValid(pos: Coord2D, tower: Set<Coord2D>): Boolean =
+fun isValid(pos: Coord2DLong, tower: Set<Coord2DLong>): Boolean =
     pos.x in 0 until 7
             && pos.y >= 0
             && pos !in tower
 
-fun dropRock(rock: List<Coord2D>, blocks: MutableSet<Coord2D>, windIdx: Long, winds: String): Long {
+fun dropRock(rock: List<Coord2DLong>, blocks: MutableSet<Coord2DLong>, windIdx: Long, winds: String): Long {
     val maxHeight = blocks.maxOfOrNull { it.y } ?: -1
-    var pos = Coord2D(2, maxHeight + 4)
+    var pos = Coord2DLong(2, maxHeight + 4)
     var j = windIdx
     while (true) {
         val wind = directions[winds[(j % winds.length).toInt()]]!!
@@ -38,9 +38,9 @@ fun dropRock(rock: List<Coord2D>, blocks: MutableSet<Coord2D>, windIdx: Long, wi
 //    printRocks(blocks)
     return j
 }
-fun printRocks(blocks: MutableSet<Coord2D>) {
+fun printRocks(blocks: MutableSet<Coord2DLong>) {
     for (i in blocks.maxOf { it.y } downTo blocks.minOf { it.y }) {
-        println((0..6L).joinToString("") { j -> if (Coord2D(j, i) in blocks) "#" else "." })
+        println((0..6L).joinToString("") { j -> if (Coord2DLong(j, i) in blocks) "#" else "." })
     }
     println()
 }
@@ -61,7 +61,7 @@ fun part(input: List<String>, rockCount: Long = 2022): Long {
     val winds = input[0]
     val simulation = 10_000L
     val history = mutableListOf<Long>()
-    val blockers = mutableSetOf<Coord2D>()
+    val blockers = mutableSetOf<Coord2DLong>()
     var windIndex = 0L
     for (i in 0 until min(rockCount, simulation)) {
         windIndex = dropRock(rocks[(i % rocks.size).toInt()], blockers, windIndex, winds)
