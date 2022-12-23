@@ -34,7 +34,7 @@ class Day23 {
                 actualMovement += if (proposedMovement.count { it.value == dest } > 1) source else dest
             }
             elves = actualMovement
-            Collections.rotate(priority, -1)
+            priority += priority.removeFirst() // shift list one step to the left
         }
         return elves
     }
@@ -58,7 +58,7 @@ class Day23 {
                 actualMovement += if (proposedMovement.count { it.value == dest } > 1) source else dest
             }
             elves = actualMovement
-            Collections.rotate(priority, -1)
+            priority += priority.removeFirst() // shift list one step to the left
             count++
         }
         return count + 1
