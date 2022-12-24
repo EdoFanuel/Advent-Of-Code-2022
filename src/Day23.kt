@@ -1,14 +1,7 @@
 import utils.Coord2DInt
-import java.util.*
+import utils.Orientation
 
 class Day23 {
-    enum class Orientation(val direction: Coord2DInt) {
-        NORTH(Coord2DInt(-1, 0)),
-        SOUTH(Coord2DInt(1,0)),
-        WEST(Coord2DInt(0, -1)),
-        EAST(Coord2DInt(0, 1))
-    }
-
     fun parseInput(input: List<String>): Set<Coord2DInt> {
         val result = mutableSetOf<Coord2DInt>()
         for (i in input.indices) {
